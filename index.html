@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Birthday & New Year!</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        :root {
+            --pink-bg: #fff5f8;
+            --soft-pink: #fce7f3;
+            --dark-pink: #db2777;
+            --purple: #7e22ce;
+            --text-gray: #4b5563;
+            --gold: #b45309;
+        }
+
+        body {
+            margin: 0; padding: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--pink-bg);
+            display: flex; justify-content: center; align-items: center;
+            height: 100vh; overflow: hidden; color: var(--text-gray);
+        }
+
+        .scene {
+            display: none; flex-direction: column; align-items: center; justify-content: center;
+            width: 90%; max-width: 450px; z-index: 10; animation: fadeIn 0.8s ease-in-out;
+        }
+
+        .active { display: flex; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .timer-container { display: flex; gap: 15px; margin: 20px 0; }
+        .time-unit {
+            background: white; padding: 15px; border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05); min-width: 60px; text-align: center;
+        }
+        .time-unit span { display: block; font-size: 2rem; font-weight: bold; color: var(--purple); }
+
+        .card-container {
+            background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px);
+            padding: 25px; border-radius: 24px; border: 2px solid var(--soft-pink);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.08); width: 100%; text-align: center;
+            max-height: 85vh; overflow-y: auto;
+        }
+
+        .gift-toggle {
+            background: linear-gradient(135deg, #a855f7, #ec4899);
+            color: white; padding: 15px; border-radius: 15px;
+            cursor: pointer; margin: 15px 0; transition: all 0.3s ease;
+        }
+        
+        .message-content {
+            max-height: 0; overflow: hidden; transition: max-height 0.8s ease;
+            font-size: 0.95rem; line-height: 1.5; color: #6d28d9;
+        }
+        .message-content.open { max-height: 1000px; margin-bottom: 20px; }
+
+        .new-year-box {
+            background: #fffbeb; border: 1px dashed var(--gold);
+            padding: 15px; border-radius: 12px; margin-top: 15px;
+        }
+
+        button {
+            background-color: var(--dark-pink); color: white; border: none;
+            padding: 12px 30px; border-radius: 50px; cursor: pointer; font-weight: bold;
+        }
+        .hidden { display: none; }
+
+        .balloon { position: absolute; bottom: -150px; z-index: 1; pointer-events: none; animation: floatUp linear forwards; }
+        @keyframes floatUp {
+            0% { transform: translateY(0) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.8; }
+            100% { transform: translateY(-120vh) rotate(20deg); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="balloon-container"></div>
+
+    <div id="scene-loader" class="scene active">
+        <div style="text-align: center;">
+            <div style="font-size: 2rem; animation: pulse 1.5s infinite;">💖 ✨ 🎆</div>
+            <p><strong>Loading your double surprise...</strong></p>
+        </div>
+    </div>
+
+    <div id="scene-countdown" class="scene">
+        <h1 style="color: var(--dark-pink);">Big Surprises in...</h1>
+        <div class="timer-container">
+            <div class="time-unit"><span>0</span>Days</div>
+            <div id="sec-box" class="time-unit" style="border: 2px solid #ec4899;"><span id="seconds">5</span>Secs</div>
+        </div>
+        <button id="btn-for-you" class="hidden">Click for Magic ➔</button>
+    </div>
+
+    <div id="scene-card" class="scene">
+        <div class="card-container">
+            <h1 style="margin: 0; font-size: 1.4rem;">Happiest Birthday Sanskrati💖</h1>
+            <p style="margin: 5px 0; color: var(--purple);"> & Happy New Year 2026! 🎆</p>
+            
+            <div class="gift-toggle" id="gift-box">
+                <div style="font-size: 2rem;" id="gift-icon">🎁</div>
+                <p id="toggle-text" style="margin: 5px 0 0 0; font-weight: bold;">Tap to see my heart</p>
+            </div>
+
+            <div id="birthday-message" class="message-content">
+                <p><strong>To My Dearest Sanskrati,</strong></p>
+                <p>Happy Birthday! You're my favorite person. My days are better and life is sweeter because of you. ✨</p>
+                
+                <div class="new-year-box">
+                    <h3 style="color: var(--gold); margin-top: 0;">🎆 Happy New Year, MY Love!</h3>
+                    <p><i>"As the clock strikes midnight, I hope 2026 brings you lots of happiness and success. Best wishes!"</i></p>
+                    <p>Cheers to a New Year. I'll always root for your happiness from afar. Have a great one! ❤️</p>
+                </div>
+
+                <p style="margin-top: 15px;">Always stay happy 😊 ♾️</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const balloonEmojis = ['🎈', '💖', '✨', '🎆', '🎁', '🥂'];
+
+        function createBalloon() {
+            const container = document.getElementById('balloon-container');
+            const b = document.createElement('div');
+            b.className = 'balloon';
+            b.innerText = balloonEmojis[Math.floor(Math.random() * balloonEmojis.length)];
+            b.style.left = Math.random() * 100 + 'vw';
+            const dur = (Math.random() * 3 + 5); 
+            b.style.animationDuration = dur + 's';
+            container.appendChild(b);
+            setTimeout(() => b.remove(), dur * 1000);
+        }
+
+        function runTimer() {
+            let timeLeft = 5;
+            const secDisplay = document.getElementById('seconds');
+            const btn = document.getElementById('btn-for-you');
+            const countdownInterval = setInterval(() => {
+                timeLeft--;
+                secDisplay.innerText = timeLeft;
+                if (timeLeft <= 0) {
+                    clearInterval(countdownInterval);
+                    btn.classList.remove('hidden');
+                }
+            }, 1000);
+        }
+
+        document.getElementById('btn-for-you').addEventListener('click', () => {
+            document.getElementById('scene-countdown').classList.remove('active');
+            document.getElementById('scene-card').classList.add('active');
+
+            // TEMPORARY MAGIC: Balloons start and then stop after 7 seconds
+            let balloonInterval = setInterval(createBalloon, 500);
+            setTimeout(() => clearInterval(balloonInterval), 7000); 
+
+            // TEMPORARY MAGIC: 3 waves of confetti then it stops
+            confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+            setTimeout(() => confetti({ particleCount: 100, angle: 60, spread: 55, origin: { x: 0 } }), 1500);
+            setTimeout(() => confetti({ particleCount: 100, angle: 120, spread: 55, origin: { x: 1 } }), 3000);
+        });
+
+        document.getElementById('gift-box').addEventListener('click', () => {
+            const msg = document.getElementById('birthday-message');
+            msg.classList.toggle('open');
+            document.getElementById('gift-icon').innerText = msg.classList.contains('open') ? "✨" : "🎁";
+        });
+
+        setTimeout(() => {
+            document.getElementById('scene-loader').classList.remove('active');
+            document.getElementById('scene-countdown').classList.add('active');
+            runTimer();
+        }, 3000);
+    </script>
+</body>
+</html>
